@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Rotina</string>
+
+    <string name="home_title">Hoje</string>
+    <string name="stats_title">Estatísticas</string>
+    <string name="settings_title">Ajustes</string>
+
+    <string name="new_habit">Novo hábito</string>
+    <string name="edit_habit">Editar hábito</string>
+    <string name="habit_name">Nome do hábito</string>
+    <string name="color">Cor</string>
+    <string name="days_of_week">Dias da semana</string>
+    <string name="times">Horários dos lembretes</string>
+    <string name="add_time">Adicionar horário</string>
+    <string name="snooze_minutes">Adiar por %1$d minutos</string>
+    <string name="enabled">Ativo</string>
+    <string name="save">Salvar</string>
+    <string name="delete">Excluir</string>
+    <string name="cancel">Cancelar</string>
+    <string name="ok">OK</string>
+    <string name="delete_confirm">Excluir este hábito e todo o seu histórico?</string>
+    <string name="error_name_required">Dê um nome ao hábito</string>
+
+    <string name="no_habits">Nenhum hábito ainda.\nToque no botão + para criar o primeiro!</string>
+    <string name="not_today">Sem lembretes hoje</string>
+    <string name="paused">Pausado</string>
+
+    <string name="notif_channel">Lembretes de hábitos</string>
+    <string name="notif_channel_desc">Notificações nos horários definidos para cada hábito</string>
+    <string name="notif_text">Lembrete das %1$s — você consegue!</string>
+    <string name="action_done">Feito ✓</string>
+    <string name="action_snooze">Adiar</string>
+
+    <string name="current_streak">Sequência atual</string>
+    <string name="best_streak">Melhor sequência</string>
+    <string name="completion_30d">Últimos 30 dias</string>
+    <string name="last_7_days">Últimos 7 dias</string>
+    <string name="no_data">Crie um hábito para ver suas estatísticas aqui.</string>
+
+    <string name="notifications_section">Notificações</string>
+    <string name="exact_alarm">Alarmes exatos</string>
+    <string name="exact_ok">Permitido — os lembretes chegarão na hora certa</string>
+    <string name="exact_needed">Toque para permitir e garantir lembretes pontuais</string>
+    <string name="notif_settings">Configurações de notificação</string>
+    <string name="notif_settings_desc">Som, vibração e prioridade dos lembretes</string>
+
+    <string name="backup_section">Backup</string>
+    <string name="export_backup">Exportar backup</string>
+    <string name="export_desc">Salva seus hábitos e histórico em um arquivo</string>
+    <string name="import_backup">Importar backup</string>
+    <string name="import_desc">Restaura os dados de um arquivo de backup</string>
+    <string name="export_done">Backup exportado com sucesso!</string>
+    <string name="import_done">Backup restaurado com sucesso!</string>
+    <string name="import_error">Não foi possível ler o arquivo</string>
+
+    <string name="about">Sobre</string>
+    <string name="about_text">Versão 1.0 — Seu app de hábitos pessoal, feito sob medida.</string>
+</resources>
