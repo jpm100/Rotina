@@ -1,6 +1,7 @@
 package com.jpm.rotina
 
 import android.app.Application
+import android.app.NotificationManager
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.jpm.rotina.alarm.AlarmScheduler
@@ -8,15 +9,28 @@ import com.jpm.rotina.data.Completion
 import com.jpm.rotina.data.Habit
 import com.jpm.rotina.data.RotinaDb
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.time.LocalDate
+import java.time.LocalTime
 
 class AppViewModel(app: Application) : AndroidViewModel(app) {
 
     private val dao = RotinaDb.get(app).dao()
 
+    // chronological order: habit with the earliest first reminder comes first;
+    // paused habits go to the bottom
     val habits = dao.habitsFlow()
+        .map { list ->
+            list.sortedWith(
+                compareBy(
+                    { !it.enabled },
+                    { it.timeList().firstOrNull() ?: LocalTime.MAX },
+                    { it.name.lowercase() }
+                )
+            )
+        }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
     val completions = dao.completionsFlow(LocalDate.now().toEpochDay() - 400)
@@ -49,6 +63,10 @@ class AppViewModel(app: Application) : AndroidViewModel(app) {
         viewModelScope.launch {
             if (done) {
                 dao.insertCompletion(Completion(habitId = habit.id, date = date.toEpochDay(), time = time))
+                // dismiss the reminder notification if it is currently showing
+                val nm = getApplication<Application>()
+                    .getSystemService(android.content.Context.NOTIFICATION_SERVICE) as NotificationManager
+                nm.cancel(habit.id.toInt())
             } else {
                 dao.deleteCompletion(habit.id, date.toEpochDay(), time)
             }

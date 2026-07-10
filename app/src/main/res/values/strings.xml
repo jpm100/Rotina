@@ -23,6 +23,9 @@
     <string name="error_name_required">Dê um nome ao hábito</string>
 
     <string name="no_habits">Nenhum hábito ainda.\nToque no botão + para criar o primeiro!</string>
+    <string name="date_pattern">EEEE, d \'de\' MMMM</string>
+    <string name="progress_done">%1$d de %2$d concluídos</string>
+    <string name="all_done">Tudo feito por hoje! 🎉</string>
     <string name="not_today">Sem lembretes hoje</string>
     <string name="paused">Pausado</string>
 
@@ -55,5 +58,5 @@
     <string name="import_error">Não foi possível ler o arquivo</string>
 
     <string name="about">Sobre</string>
-    <string name="about_text">Versão 1.0 — Seu app de hábitos pessoal, feito sob medida.</string>
+    <string name="about_text">Versão 1.1 — Seu app de hábitos pessoal, feito sob medida.</string>
 </resources>

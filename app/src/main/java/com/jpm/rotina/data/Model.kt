@@ -81,6 +81,9 @@ interface RotinaDao {
     @Query("DELETE FROM Completion WHERE habitId = :habitId AND date = :date AND time = :time")
     suspend fun deleteCompletion(habitId: Long, date: Long, time: String)
 
+    @Query("SELECT COUNT(*) FROM Completion WHERE habitId = :habitId AND date = :date AND time = :time")
+    suspend fun completionCount(habitId: Long, date: Long, time: String): Int
+
     @Query("DELETE FROM Completion WHERE habitId = :habitId")
     suspend fun deleteCompletionsFor(habitId: Long)
 

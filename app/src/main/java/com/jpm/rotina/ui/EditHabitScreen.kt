@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -35,6 +36,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Slider
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -52,6 +54,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.jpm.rotina.AppViewModel
@@ -187,50 +190,97 @@ fun EditHabitScreen(vm: AppViewModel, habitId: Long, onBack: () -> Unit) {
 
             Column {
                 Text(stringResource(R.string.days_of_week), style = MaterialTheme.typography.titleSmall)
-                Spacer(Modifier.height(8.dp))
-                FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                Spacer(Modifier.height(10.dp))
+                Row(
+                    Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
                     DayOfWeek.entries.forEach { dow ->
                         val bit = 1 shl (dow.value - 1)
                         val selected = days and bit != 0
-                        FilterChip(
-                            selected = selected,
+                        Surface(
                             onClick = { days = days xor bit },
-                            label = {
-                                Text(dow.getDisplayName(TextStyle.SHORT, Locale.getDefault()))
+                            shape = CircleShape,
+                            color = if (selected) MaterialTheme.colorScheme.primary
+                            else MaterialTheme.colorScheme.surfaceContainerHigh,
+                            modifier = Modifier.size(42.dp)
+                        ) {
+                            Box(contentAlignment = Alignment.Center) {
+                                Text(
+                                    dow.getDisplayName(TextStyle.NARROW, Locale.getDefault())
+                                        .uppercase(Locale.getDefault()),
+                                    style = MaterialTheme.typography.labelLarge,
+                                    fontWeight = if (selected) FontWeight.Bold else FontWeight.Medium,
+                                    color = if (selected) MaterialTheme.colorScheme.onPrimary
+                                    else MaterialTheme.colorScheme.onSurfaceVariant
+                                )
                             }
-                        )
+                        }
                     }
                 }
             }
 
             Column {
                 Text(stringResource(R.string.times), style = MaterialTheme.typography.titleSmall)
-                Spacer(Modifier.height(8.dp))
-                FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                Spacer(Modifier.height(10.dp))
+                FlowRow(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
                     times.forEach { t ->
-                        InputChip(
-                            selected = true,
+                        Surface(
                             onClick = { if (times.size > 1) times = times - t },
-                            label = { Text(t) },
-                            trailingIcon = {
+                            shape = RoundedCornerShape(50),
+                            color = MaterialTheme.colorScheme.secondaryContainer
+                        ) {
+                            Row(
+                                Modifier.padding(horizontal = 14.dp, vertical = 8.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    t,
+                                    style = MaterialTheme.typography.labelLarge,
+                                    fontWeight = FontWeight.SemiBold,
+                                    color = MaterialTheme.colorScheme.onSecondaryContainer
+                                )
                                 if (times.size > 1) {
+                                    Spacer(Modifier.width(6.dp))
                                     Icon(
                                         Icons.Filled.Close,
                                         contentDescription = stringResource(R.string.delete),
-                                        modifier = Modifier.size(16.dp)
+                                        tint = MaterialTheme.colorScheme.onSecondaryContainer,
+                                        modifier = Modifier.size(14.dp)
                                     )
                                 }
                             }
-                        )
-                    }
-                    InputChip(
-                        selected = false,
-                        onClick = { showTimePicker = true },
-                        label = { Text(stringResource(R.string.add_time)) },
-                        leadingIcon = {
-                            Icon(Icons.Filled.Add, contentDescription = null, modifier = Modifier.size(16.dp))
                         }
-                    )
+                    }
+                    Surface(
+                        onClick = { showTimePicker = true },
+                        shape = RoundedCornerShape(50),
+                        color = androidx.compose.ui.graphics.Color.Transparent,
+                        border = androidx.compose.foundation.BorderStroke(
+                            1.dp, MaterialTheme.colorScheme.outlineVariant
+                        )
+                    ) {
+                        Row(
+                            Modifier.padding(horizontal = 14.dp, vertical = 8.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(
+                                Icons.Filled.Add,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier.size(16.dp)
+                            )
+                            Spacer(Modifier.width(4.dp))
+                            Text(
+                                stringResource(R.string.add_time),
+                                style = MaterialTheme.typography.labelLarge,
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                        }
+                    }
                 }
             }
 

@@ -32,7 +32,12 @@ class ReminderReceiver : BroadcastReceiver() {
                     AlarmScheduler.ACTION_REMIND -> {
                         val habit = dao.habit(habitId)
                         if (habit != null && habit.enabled) {
-                            showNotification(context, habit.id, habit.name, habit.color, time)
+                            val alreadyDone = dao.completionCount(
+                                habitId, LocalDate.now().toEpochDay(), time
+                            ) > 0
+                            if (!alreadyDone) {
+                                showNotification(context, habit.id, habit.name, habit.color, time)
+                            }
                             if (!snoozed) AlarmScheduler.scheduleNext(context, habit)
                         }
                     }

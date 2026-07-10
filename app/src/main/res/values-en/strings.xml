@@ -23,6 +23,9 @@
     <string name="error_name_required">Give the habit a name</string>
 
     <string name="no_habits">No habits yet.\nTap the + button to create your first one!</string>
+    <string name="date_pattern">EEEE, MMMM d</string>
+    <string name="progress_done">%1$d of %2$d done</string>
+    <string name="all_done">All done for today! 🎉</string>
     <string name="not_today">No reminders today</string>
     <string name="paused">Paused</string>
 
@@ -55,5 +58,5 @@
     <string name="import_error">Could not read the file</string>
 
     <string name="about">About</string>
-    <string name="about_text">Version 1.0 — Your personal habit app, custom made.</string>
+    <string name="about_text">Version 1.1 — Your personal habit app, custom made.</string>
 </resources>
