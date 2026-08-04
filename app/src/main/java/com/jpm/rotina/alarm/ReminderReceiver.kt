@@ -11,6 +11,7 @@ import com.jpm.rotina.R
 import com.jpm.rotina.RotinaApp
 import com.jpm.rotina.data.Completion
 import com.jpm.rotina.data.Reminder
+import com.jpm.rotina.data.ReminderDone
 import com.jpm.rotina.data.RotinaDb
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -74,6 +75,9 @@ class ReminderReceiver : BroadcastReceiver() {
     private fun handleReminder(context: Context, intent: Intent) {
         val reminderId = intent.getLongExtra(AlarmScheduler.EXTRA_REMINDER_ID, -1)
         if (reminderId < 0) return
+        val occurrence = intent.getLongExtra(AlarmScheduler.EXTRA_OCCURRENCE, Long.MIN_VALUE)
+        if (occurrence == Long.MIN_VALUE) return
+        val snoozed = intent.getBooleanExtra(AlarmScheduler.EXTRA_SNOOZED, false)
         val pending = goAsync()
 
         CoroutineScope(Dispatchers.IO).launch {
@@ -82,19 +86,29 @@ class ReminderReceiver : BroadcastReceiver() {
                 when (intent.action) {
                     AlarmScheduler.ACTION_REMINDER_FIRE -> {
                         val reminder = dao.reminder(reminderId)
-                        if (reminder != null && !reminder.done) {
-                            showReminderNotification(context, reminder)
+                        if (reminder != null) {
+                            val alreadyDone = occurrence in dao.doneDatesFor(reminderId)
+                            if (!alreadyDone) {
+                                showReminderNotification(context, reminder, occurrence)
+                            }
+                            // a snooze fires the same occurrence again; only a real firing
+                            // should advance a repeating reminder to its next date
+                            if (!snoozed) AlarmScheduler.scheduleReminder(context, reminder)
                         }
                     }
                     AlarmScheduler.ACTION_REMINDER_DONE -> {
-                        dao.setReminderDone(reminderId, true)
-                        AlarmScheduler.cancelReminder(context, reminderId)
+                        dao.insertReminderDone(
+                            ReminderDone(reminderId = reminderId, date = occurrence)
+                        )
                         notificationManager(context)
                             .cancel(AlarmScheduler.reminderNotificationId(reminderId))
+                        dao.reminder(reminderId)?.let {
+                            AlarmScheduler.scheduleReminder(context, it)
+                        }
                     }
                     AlarmScheduler.ACTION_REMINDER_SNOOZE -> {
                         AlarmScheduler.scheduleReminderSnooze(
-                            context, reminderId, AlarmScheduler.SNOOZE_MINUTES_REMINDER
+                            context, reminderId, occurrence, AlarmScheduler.SNOOZE_MINUTES_REMINDER
                         )
                         notificationManager(context)
                             .cancel(AlarmScheduler.reminderNotificationId(reminderId))
@@ -106,7 +120,7 @@ class ReminderReceiver : BroadcastReceiver() {
         }
     }
 
-    private fun showReminderNotification(context: Context, reminder: Reminder) {
+    private fun showReminderNotification(context: Context, reminder: Reminder, occurrence: Long) {
         val openApp = PendingIntent.getActivity(
             context, AlarmScheduler.reminderNotificationId(reminder.id),
             Intent(context, MainActivity::class.java),
@@ -117,6 +131,7 @@ class ReminderReceiver : BroadcastReceiver() {
             Intent(context, ReminderReceiver::class.java).apply {
                 action = AlarmScheduler.ACTION_REMINDER_DONE
                 putExtra(AlarmScheduler.EXTRA_REMINDER_ID, reminder.id)
+                putExtra(AlarmScheduler.EXTRA_OCCURRENCE, occurrence)
             },
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
@@ -125,6 +140,7 @@ class ReminderReceiver : BroadcastReceiver() {
             Intent(context, ReminderReceiver::class.java).apply {
                 action = AlarmScheduler.ACTION_REMINDER_SNOOZE
                 putExtra(AlarmScheduler.EXTRA_REMINDER_ID, reminder.id)
+                putExtra(AlarmScheduler.EXTRA_OCCURRENCE, occurrence)
             },
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )

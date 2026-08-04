@@ -8,6 +8,7 @@ import android.os.Build
 import com.jpm.rotina.data.Habit
 import com.jpm.rotina.data.Reminder
 import com.jpm.rotina.data.RotinaDb
+import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZoneId
 
@@ -21,6 +22,8 @@ object AlarmScheduler {
     const val ACTION_REMINDER_SNOOZE = "com.jpm.rotina.REMINDER_SNOOZE"
     const val EXTRA_HABIT_ID = "habitId"
     const val EXTRA_REMINDER_ID = "reminderId"
+    const val EXTRA_OCCURRENCE = "occurrence"
+    const val EXTRA_SNOOZED = "snoozed"
     const val EXTRA_TIME = "time"
 
     /** Habits and one-off reminders must never share a notification id or a PendingIntent
@@ -88,28 +91,51 @@ object AlarmScheduler {
         am.cancel(pi)
     }
 
-    /** One-off alarm for a dated reminder. Past, completed and muted ones are simply not set. */
-    fun scheduleReminder(context: Context, reminder: Reminder) {
+    /**
+     * Arms the reminder's next pending occurrence — the first one still in the future that
+     * has not been ticked off. Recurring reminders re-arm from here after each firing.
+     */
+    suspend fun scheduleReminder(context: Context, reminder: Reminder) {
         cancelReminder(context, reminder.id)
-        if (!reminder.notify || reminder.done) return
-        val dt = reminder.dateTime()
-        if (!dt.isAfter(LocalDateTime.now())) return
+        if (!reminder.notify) return
+
+        val doneDates = RotinaDb.get(context).dao().doneDatesFor(reminder.id).toSet()
+        val day = nextPendingOccurrence(reminder, doneDates) ?: return
 
         val intent = Intent(context, ReminderReceiver::class.java).apply {
             action = ACTION_REMINDER_FIRE
             putExtra(EXTRA_REMINDER_ID, reminder.id)
+            putExtra(EXTRA_OCCURRENCE, day.toEpochDay())
         }
         val pi = PendingIntent.getBroadcast(
             context, reminderRequestCode(reminder.id, 0), intent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
-        setAlarm(context, dt.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli(), pi)
+        val triggerAt = reminder.dateTimeOn(day)
+            .atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
+        setAlarm(context, triggerAt, pi)
     }
 
-    fun scheduleReminderSnooze(context: Context, reminderId: Long, minutes: Int) {
+    /** First occurrence whose notification time is still ahead and that is not yet done. */
+    private fun nextPendingOccurrence(reminder: Reminder, doneDates: Set<Long>): LocalDate? {
+        val now = LocalDateTime.now()
+        var day = reminder.occurrenceOnOrAfter(now.toLocalDate()) ?: return null
+        // a handful of steps is enough to skip today's past/ticked-off occurrences
+        for (i in 0 until 60) {
+            val pending = reminder.dateTimeOn(day).isAfter(now) &&
+                day.toEpochDay() !in doneDates
+            if (pending) return day
+            day = reminder.occurrenceOnOrAfter(day.plusDays(1)) ?: return null
+        }
+        return null
+    }
+
+    fun scheduleReminderSnooze(context: Context, reminderId: Long, occurrence: Long, minutes: Int) {
         val intent = Intent(context, ReminderReceiver::class.java).apply {
             action = ACTION_REMINDER_FIRE
             putExtra(EXTRA_REMINDER_ID, reminderId)
+            putExtra(EXTRA_OCCURRENCE, occurrence)
+            putExtra(EXTRA_SNOOZED, true)
         }
         val pi = PendingIntent.getBroadcast(
             context, reminderRequestCode(reminderId, 3), intent,

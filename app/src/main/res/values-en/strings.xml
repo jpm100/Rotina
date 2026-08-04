@@ -82,6 +82,19 @@
     <string name="legend_less">less</string>
     <string name="legend_more">more</string>
 
+    <string name="repeat_section">Repeat</string>
+    <string name="repeat_none">Do not repeat</string>
+    <string name="repeat_daily">Every day</string>
+    <string name="repeat_weekly">Every week</string>
+    <string name="repeat_monthly_day">Every month, on day %1$d</string>
+    <string name="repeat_monthly_week">Every month, same week</string>
+    <string name="repeat_monthly_last_week">Every month, last week</string>
+    <string name="repeat_yearly">Every year</string>
+    <string name="repeat_preview">Next: %1$s</string>
+    <string name="preview_date_pattern">EEE, MMM d</string>
+    <string name="repeats">Repeating reminder</string>
+    <string name="delete_repeating_reminder_confirm">Delete this reminder and all of its repeats?</string>
+
     <string name="about">About</string>
-    <string name="about_text">Version 1.2 — Your personal habit app, custom made.</string>
+    <string name="about_text">Version 1.3 — Your personal habit app, custom made.</string>
 </resources>

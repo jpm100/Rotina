@@ -82,6 +82,19 @@
     <string name="legend_less">menos</string>
     <string name="legend_more">mais</string>
 
+    <string name="repeat_section">Repetição</string>
+    <string name="repeat_none">Não repetir</string>
+    <string name="repeat_daily">Todos os dias</string>
+    <string name="repeat_weekly">Toda semana</string>
+    <string name="repeat_monthly_day">Todo mês, no dia %1$d</string>
+    <string name="repeat_monthly_week">Todo mês, na mesma semana</string>
+    <string name="repeat_monthly_last_week">Todo mês, na última semana</string>
+    <string name="repeat_yearly">Todo ano</string>
+    <string name="repeat_preview">Próximas: %1$s</string>
+    <string name="preview_date_pattern">EEE, d MMM</string>
+    <string name="repeats">Lembrete repetido</string>
+    <string name="delete_repeating_reminder_confirm">Excluir este lembrete e todas as suas repetições?</string>
+
     <string name="about">Sobre</string>
-    <string name="about_text">Versão 1.2 — Seu app de hábitos pessoal, feito sob medida.</string>
+    <string name="about_text">Versão 1.3 — Seu app de hábitos pessoal, feito sob medida.</string>
 </resources>

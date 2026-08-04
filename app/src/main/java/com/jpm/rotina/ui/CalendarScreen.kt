@@ -25,6 +25,7 @@ import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Repeat
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -58,6 +59,7 @@ import com.jpm.rotina.R
 import com.jpm.rotina.data.Completion
 import com.jpm.rotina.data.Habit
 import com.jpm.rotina.data.Reminder
+import com.jpm.rotina.data.RepeatType
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.YearMonth
@@ -69,6 +71,7 @@ fun CalendarScreen(vm: AppViewModel, onEditReminder: (Long, Long) -> Unit) {
     val habits by vm.habits.collectAsStateWithLifecycle()
     val completions by vm.completions.collectAsStateWithLifecycle()
     val reminders by vm.reminders.collectAsStateWithLifecycle()
+    val reminderDones by vm.reminderDones.collectAsStateWithLifecycle()
 
     val today = remember { LocalDate.now() }
     var month by remember { mutableStateOf(YearMonth.from(today)) }
@@ -108,6 +111,7 @@ fun CalendarScreen(vm: AppViewModel, onEditReminder: (Long, Long) -> Unit) {
                     habits = habits,
                     completions = completions,
                     reminders = reminders,
+                    reminderDones = reminderDones,
                     onSelect = { selected = it }
                 )
             }
@@ -121,9 +125,12 @@ fun CalendarScreen(vm: AppViewModel, onEditReminder: (Long, Long) -> Unit) {
                     today = today,
                     habits = habits,
                     completions = completions,
-                    reminders = reminders.filter { it.date == selected.toEpochDay() },
+                    reminders = reminders.filter { it.occursOn(selected) },
+                    reminderDones = reminderDones,
                     onToggleSlot = { habit, slot, done -> vm.setDone(habit, selected, slot, done) },
-                    onToggleReminder = { reminder, done -> vm.setReminderDone(reminder, done) },
+                    onToggleReminder = { reminder, done ->
+                        vm.setReminderDone(reminder, selected, done)
+                    },
                     onEditReminder = { onEditReminder(it, selected.toEpochDay()) }
                 )
             }
@@ -182,6 +189,7 @@ private fun MonthGrid(
     habits: List<Habit>,
     completions: List<Completion>,
     reminders: List<Reminder>,
+    reminderDones: Set<Pair<Long, Long>>,
     onSelect: (LocalDate) -> Unit
 ) {
     val firstOfMonth = month.atDay(1)
@@ -192,7 +200,13 @@ private fun MonthGrid(
     val rows = (cells + 6) / 7
 
     val doneByDay = remember(completions) { completions.groupBy { it.date } }
-    val remindersByDay = remember(reminders) { reminders.groupBy { it.date } }
+    // a repeating reminder lands on many days, so this is resolved per day of the month
+    val remindersByDay = remember(reminders, month) {
+        (1..daysInMonth).associate { dayNumber ->
+            val date = month.atDay(dayNumber)
+            date.toEpochDay() to reminders.filter { it.occursOn(date) }
+        }
+    }
 
     Column(Modifier.padding(top = 4.dp)) {
         Row(Modifier.fillMaxWidth()) {
@@ -221,6 +235,7 @@ private fun MonthGrid(
                             isSelected = date == selected,
                             ratio = completionRatio(date, today, habits, doneByDay),
                             reminders = remindersByDay[date.toEpochDay()].orEmpty(),
+                            reminderDones = reminderDones,
                             onClick = { onSelect(date) },
                             modifier = Modifier.weight(1f)
                         )
@@ -256,6 +271,7 @@ private fun DayCell(
     isSelected: Boolean,
     ratio: Float?,
     reminders: List<Reminder>,
+    reminderDones: Set<Pair<Long, Long>>,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -311,12 +327,13 @@ private fun DayCell(
                     Spacer(Modifier.height(2.dp))
                     Row(horizontalArrangement = Arrangement.spacedBy(2.dp)) {
                         reminders.take(3).forEach { r ->
+                            val rDone = (r.id to date.toEpochDay()) in reminderDones
                             Box(
                                 Modifier
                                     .size(4.dp)
                                     .clip(CircleShape)
                                     .background(
-                                        if (r.done) MaterialTheme.colorScheme.outlineVariant
+                                        if (rDone) MaterialTheme.colorScheme.outlineVariant
                                         else Color(r.color)
                                     )
                             )
@@ -376,6 +393,7 @@ private fun DayDetail(
     habits: List<Habit>,
     completions: List<Completion>,
     reminders: List<Reminder>,
+    reminderDones: Set<Pair<Long, Long>>,
     onToggleSlot: (Habit, String, Boolean) -> Unit,
     onToggleReminder: (Reminder, Boolean) -> Unit,
     onEditReminder: (Long) -> Unit
@@ -408,9 +426,11 @@ private fun DayDetail(
         }
 
         reminders.forEach { reminder ->
+            val done = (reminder.id to date.toEpochDay()) in reminderDones
             ReminderRow(
                 reminder = reminder,
-                onToggle = { onToggleReminder(reminder, !reminder.done) },
+                done = done,
+                onToggle = { onToggleReminder(reminder, !done) },
                 onClick = { onEditReminder(reminder.id) }
             )
             Spacer(Modifier.height(8.dp))
@@ -478,7 +498,12 @@ private fun DayDetail(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ReminderRow(reminder: Reminder, onToggle: () -> Unit, onClick: () -> Unit) {
+fun ReminderRow(
+    reminder: Reminder,
+    done: Boolean,
+    onToggle: () -> Unit,
+    onClick: () -> Unit
+) {
     val accent = Color(reminder.color)
     Card(
         onClick = onClick,
@@ -495,12 +520,12 @@ fun ReminderRow(reminder: Reminder, onToggle: () -> Unit, onClick: () -> Unit) {
             Surface(
                 onClick = onToggle,
                 shape = CircleShape,
-                color = if (reminder.done) accent else Color.Transparent,
-                border = if (reminder.done) null else BorderStroke(2.dp, accent),
+                color = if (done) accent else Color.Transparent,
+                border = if (done) null else BorderStroke(2.dp, accent),
                 modifier = Modifier.size(26.dp)
             ) {
                 Box(contentAlignment = Alignment.Center) {
-                    if (reminder.done) {
+                    if (done) {
                         Icon(
                             Icons.Filled.Check,
                             contentDescription = null,
@@ -512,14 +537,26 @@ fun ReminderRow(reminder: Reminder, onToggle: () -> Unit, onClick: () -> Unit) {
             }
             Spacer(Modifier.width(12.dp))
             Column(Modifier.weight(1f)) {
-                Text(
-                    reminder.title,
-                    style = MaterialTheme.typography.titleSmall,
-                    fontWeight = FontWeight.SemiBold,
-                    textDecoration = if (reminder.done) TextDecoration.LineThrough else null,
-                    color = if (reminder.done) MaterialTheme.colorScheme.onSurfaceVariant
-                    else MaterialTheme.colorScheme.onSurface
-                )
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        reminder.title,
+                        style = MaterialTheme.typography.titleSmall,
+                        fontWeight = FontWeight.SemiBold,
+                        textDecoration = if (done) TextDecoration.LineThrough else null,
+                        color = if (done) MaterialTheme.colorScheme.onSurfaceVariant
+                        else MaterialTheme.colorScheme.onSurface,
+                        modifier = Modifier.weight(1f, fill = false)
+                    )
+                    if (reminder.rule != RepeatType.NONE) {
+                        Spacer(Modifier.width(6.dp))
+                        Icon(
+                            Icons.Filled.Repeat,
+                            contentDescription = stringResource(R.string.repeats),
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.size(14.dp)
+                        )
+                    }
+                }
                 val subtitle = reminder.time ?: stringResource(R.string.all_day)
                 Text(
                     if (reminder.notes.isBlank()) subtitle else "$subtitle · ${reminder.notes}",

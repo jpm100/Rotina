@@ -66,6 +66,7 @@ fun HomeScreen(vm: AppViewModel, onEdit: (Long) -> Unit, onEditReminder: (Long, 
     val habits by vm.habits.collectAsStateWithLifecycle()
     val completions by vm.completions.collectAsStateWithLifecycle()
     val reminders by vm.reminders.collectAsStateWithLifecycle()
+    val reminderDones by vm.reminderDones.collectAsStateWithLifecycle()
     val todayItems by vm.todayItems.collectAsStateWithLifecycle()
     val today = LocalDate.now()
 
@@ -108,7 +109,7 @@ fun HomeScreen(vm: AppViewModel, onEdit: (Long) -> Unit, onEditReminder: (Long, 
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             item(key = "header") {
-                TodayHeader(habits, completions, reminders, today)
+                TodayHeader(habits, completions, reminders, reminderDones, today)
             }
             items(
                 todayItems,
@@ -127,11 +128,15 @@ fun HomeScreen(vm: AppViewModel, onEdit: (Long) -> Unit, onEditReminder: (Long, 
                         onToggle = { slot, done -> vm.setDone(item.habit, today, slot, done) },
                         onClick = { onEdit(item.habit.id) }
                     )
-                    is TodayItem.ReminderItem -> ReminderRow(
-                        reminder = item.reminder,
-                        onToggle = { vm.setReminderDone(item.reminder, !item.reminder.done) },
-                        onClick = { onEditReminder(item.reminder.id, today.toEpochDay()) }
-                    )
+                    is TodayItem.ReminderItem -> {
+                        val done = (item.reminder.id to today.toEpochDay()) in reminderDones
+                        ReminderRow(
+                            reminder = item.reminder,
+                            done = done,
+                            onToggle = { vm.setReminderDone(item.reminder, today, !done) },
+                            onClick = { onEditReminder(item.reminder.id, today.toEpochDay()) }
+                        )
+                    }
                 }
             }
         }
@@ -143,6 +148,7 @@ private fun TodayHeader(
     habits: List<Habit>,
     completions: List<Completion>,
     reminders: List<Reminder>,
+    reminderDones: Set<Pair<Long, Long>>,
     today: LocalDate
 ) {
     val dateText = today
@@ -161,9 +167,10 @@ private fun TodayHeader(
         .filter { it.date == today.toEpochDay() }
         .map { it.habitId to it.time }
         .toSet()
-    val todayReminders = reminders.filter { it.date == today.toEpochDay() }
-    // the day's progress counts habit slots and one-off reminders alike
-    val doneCount = scheduledSlots.count { it in doneSet } + todayReminders.count { it.done }
+    val todayReminders = reminders.filter { it.occursOn(today) }
+    // the day's progress counts habit slots and reminder occurrences alike
+    val doneCount = scheduledSlots.count { it in doneSet } +
+        todayReminders.count { (it.id to today.toEpochDay()) in reminderDones }
     val total = scheduledSlots.size + todayReminders.size
 
     Column(Modifier.padding(bottom = 8.dp)) {

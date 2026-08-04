@@ -8,6 +8,7 @@ import com.jpm.rotina.alarm.AlarmScheduler
 import com.jpm.rotina.data.Completion
 import com.jpm.rotina.data.Habit
 import com.jpm.rotina.data.Reminder
+import com.jpm.rotina.data.ReminderDone
 import com.jpm.rotina.data.RotinaDb
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
@@ -57,13 +58,18 @@ class AppViewModel(app: Application) : AndroidViewModel(app) {
     val reminders = dao.remindersFlow()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
-    /** Habits scheduled today plus today's reminders, merged into a single ordered list. */
+    /** Completed reminder occurrences, as (reminderId, epochDay) pairs. */
+    val reminderDones = dao.reminderDonesFlow()
+        .map { list -> list.map { it.reminderId to it.date }.toSet() }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptySet())
+
+    /** Habits scheduled today plus today's reminder occurrences, in one ordered list. */
     val todayItems = combine(habits, reminders) { habitList, reminderList ->
         val today = LocalDate.now()
         val items = buildList<TodayItem> {
             habitList.forEach { add(TodayItem.HabitItem(it)) }
             reminderList
-                .filter { it.date == today.toEpochDay() }
+                .filter { it.occursOn(today) }
                 .forEach { add(TodayItem.ReminderItem(it)) }
         }
         items.sortedWith(
@@ -122,19 +128,24 @@ class AppViewModel(app: Application) : AndroidViewModel(app) {
         viewModelScope.launch {
             AlarmScheduler.cancelReminder(getApplication(), reminder.id)
             notificationManager().cancel(AlarmScheduler.reminderNotificationId(reminder.id))
+            dao.deleteReminderDonesFor(reminder.id)
             dao.deleteReminder(reminder)
         }
     }
 
-    fun setReminderDone(reminder: Reminder, done: Boolean) {
+    /** Ticks a single occurrence of [reminder] on [date] off, or puts it back. */
+    fun setReminderDone(reminder: Reminder, date: LocalDate, done: Boolean) {
         viewModelScope.launch {
-            dao.setReminderDone(reminder.id, done)
             if (done) {
-                AlarmScheduler.cancelReminder(getApplication(), reminder.id)
+                dao.insertReminderDone(
+                    ReminderDone(reminderId = reminder.id, date = date.toEpochDay())
+                )
                 notificationManager().cancel(AlarmScheduler.reminderNotificationId(reminder.id))
             } else {
-                AlarmScheduler.scheduleReminder(getApplication(), reminder.copy(done = false))
+                dao.deleteReminderDone(reminder.id, date.toEpochDay())
             }
+            // the next pending occurrence may have moved either way
+            AlarmScheduler.scheduleReminder(getApplication(), reminder)
         }
     }
 

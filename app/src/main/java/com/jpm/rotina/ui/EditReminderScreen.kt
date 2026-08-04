@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -32,6 +33,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
@@ -56,6 +58,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.jpm.rotina.AppViewModel
 import com.jpm.rotina.R
 import com.jpm.rotina.data.Reminder
+import com.jpm.rotina.data.RepeatType
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneOffset
@@ -79,7 +82,7 @@ fun EditReminderScreen(
     var time by remember { mutableStateOf<String?>(null) }
     var color by remember { mutableStateOf(HabitColors[1]) }
     var notify by remember { mutableStateOf(true) }
-    var done by remember { mutableStateOf(false) }
+    var repeat by remember { mutableStateOf(RepeatType.NONE) }
     var createdAt by remember { mutableStateOf(System.currentTimeMillis()) }
 
     var showDatePicker by remember { mutableStateOf(false) }
@@ -96,7 +99,7 @@ fun EditReminderScreen(
                 time = r.time
                 color = r.color
                 notify = r.notify
-                done = r.done
+                repeat = r.rule
                 createdAt = r.createdAt
                 loaded = true
             }
@@ -116,7 +119,7 @@ fun EditReminderScreen(
                 time = time,
                 color = color,
                 notes = notes.trim(),
-                done = done,
+                repeatType = repeat.id,
                 notify = notify,
                 createdAt = createdAt
             )
@@ -233,6 +236,12 @@ fun EditReminderScreen(
                 }
             }
 
+            RepeatPicker(
+                date = date,
+                selected = repeat,
+                onSelect = { repeat = it }
+            )
+
             Column {
                 Text(stringResource(R.string.color), style = MaterialTheme.typography.titleSmall)
                 Spacer(Modifier.height(10.dp))
@@ -340,7 +349,14 @@ fun EditReminderScreen(
         AlertDialog(
             onDismissRequest = { showDeleteConfirm = false },
             title = { Text(stringResource(R.string.delete)) },
-            text = { Text(stringResource(R.string.delete_reminder_confirm)) },
+            text = {
+                Text(
+                    stringResource(
+                        if (repeat == RepeatType.NONE) R.string.delete_reminder_confirm
+                        else R.string.delete_repeating_reminder_confirm
+                    )
+                )
+            },
             confirmButton = {
                 TextButton(onClick = {
                     reminders.find { it.id == reminderId }?.let { vm.deleteReminder(it) }
@@ -354,5 +370,61 @@ fun EditReminderScreen(
                 }
             }
         )
+    }
+}
+
+/**
+ * Repeat rules are all derived from the reminder's date, so instead of spelling out the
+ * grammar ("first Friday of the month") each option previews the dates it actually produces.
+ */
+@Composable
+private fun RepeatPicker(
+    date: LocalDate,
+    selected: RepeatType,
+    onSelect: (RepeatType) -> Unit
+) {
+    val options = listOf(
+        RepeatType.NONE to stringResource(R.string.repeat_none),
+        RepeatType.DAILY to stringResource(R.string.repeat_daily),
+        RepeatType.WEEKLY to stringResource(R.string.repeat_weekly),
+        RepeatType.MONTHLY_DAY to stringResource(R.string.repeat_monthly_day, date.dayOfMonth),
+        RepeatType.MONTHLY_WEEK to stringResource(R.string.repeat_monthly_week),
+        RepeatType.MONTHLY_LAST_WEEK to stringResource(R.string.repeat_monthly_last_week),
+        RepeatType.YEARLY to stringResource(R.string.repeat_yearly)
+    )
+    val previewFormat = DateTimeFormatter.ofPattern(
+        stringResource(R.string.preview_date_pattern), Locale.getDefault()
+    )
+
+    Column {
+        Text(stringResource(R.string.repeat_section), style = MaterialTheme.typography.titleSmall)
+        Spacer(Modifier.height(6.dp))
+        options.forEach { (type, label) ->
+            Row(
+                Modifier
+                    .fillMaxWidth()
+                    .clickable { onSelect(type) }
+                    .padding(vertical = 6.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                RadioButton(selected = selected == type, onClick = { onSelect(type) })
+                Spacer(Modifier.width(4.dp))
+                Column(Modifier.weight(1f)) {
+                    Text(label, style = MaterialTheme.typography.bodyLarge)
+                    if (selected == type && type != RepeatType.NONE) {
+                        val preview = Reminder(title = "", date = date.toEpochDay(), repeatType = type.id)
+                            .upcomingOccurrences(date, 3)
+                            .joinToString(" · ") { it.format(previewFormat) }
+                        if (preview.isNotBlank()) {
+                            Text(
+                                stringResource(R.string.repeat_preview, preview),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                        }
+                    }
+                }
+            }
+        }
     }
 }

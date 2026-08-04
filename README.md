@@ -8,6 +8,9 @@ nos horários que você definir — várias por dia, por hábito.
 - ✅ Hábitos ilimitados, cada um com nome, cor e dias da semana próprios
 - ⏰ Vários horários de lembrete por dia para cada hábito
 - 🔔 Notificações pontuais com botões **"Feito ✓"** e **"Adiar"** direto na notificação
+- 📅 Calendário com o histórico dos hábitos em mapa de calor
+- 🗓️ Lembretes avulsos com data, horário opcional e repetição
+  (diária, semanal, mensal por dia do mês, mensal por semana, anual)
 - 🔥 Sequências (streaks), estatísticas e gráfico dos últimos 7 dias
 - 💾 Backup e restauração dos dados em arquivo
 - 🌗 Tema claro/escuro automático (segue o celular) e idioma português/inglês

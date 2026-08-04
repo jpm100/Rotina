@@ -3,6 +3,7 @@ package com.jpm.rotina.backup
 import com.jpm.rotina.data.Completion
 import com.jpm.rotina.data.Habit
 import com.jpm.rotina.data.Reminder
+import com.jpm.rotina.data.ReminderDone
 import com.jpm.rotina.data.RotinaDao
 import org.json.JSONArray
 import org.json.JSONObject
@@ -11,7 +12,7 @@ object Backup {
 
     suspend fun export(dao: RotinaDao): String {
         val root = JSONObject()
-        root.put("version", 2)
+        root.put("version", 3)
         root.put("exportedAt", System.currentTimeMillis())
 
         val habits = JSONArray()
@@ -49,12 +50,22 @@ object Backup {
                 put("time", r.time ?: JSONObject.NULL)
                 put("color", r.color)
                 put("notes", r.notes)
-                put("done", r.done)
+                put("repeatType", r.repeatType)
                 put("notify", r.notify)
                 put("createdAt", r.createdAt)
             })
         }
         root.put("reminders", reminders)
+
+        val reminderDones = JSONArray()
+        dao.reminderDones().forEach { d ->
+            reminderDones.put(JSONObject().apply {
+                put("reminderId", d.reminderId)
+                put("date", d.date)
+                put("doneAt", d.doneAt)
+            })
+        }
+        root.put("reminderDones", reminderDones)
         return root.toString(2)
     }
 
@@ -65,9 +76,11 @@ object Backup {
             val completions = root.optJSONArray("completions") ?: JSONArray()
             // absent in v1 backups, which restore with no reminders
             val reminders = root.optJSONArray("reminders") ?: JSONArray()
+            val reminderDones = root.optJSONArray("reminderDones") ?: JSONArray()
 
             dao.clearCompletions()
             dao.clearHabits()
+            dao.clearReminderDones()
             dao.clearReminders()
 
             for (i in 0 until habits.length()) {
@@ -106,9 +119,25 @@ object Backup {
                         time = if (r.isNull("time")) null else r.optString("time").ifBlank { null },
                         color = r.optLong("color", 0xFF1E88E5),
                         notes = r.optString("notes", ""),
-                        done = r.optBoolean("done", false),
+                        repeatType = r.optInt("repeatType", 0),
                         notify = r.optBoolean("notify", true),
                         createdAt = r.optLong("createdAt", System.currentTimeMillis())
+                    )
+                )
+                // a v2 backup stored completion on the row itself
+                if (r.optBoolean("done", false)) {
+                    dao.insertReminderDone(
+                        ReminderDone(reminderId = r.optLong("id", 0), date = r.getLong("date"))
+                    )
+                }
+            }
+            for (i in 0 until reminderDones.length()) {
+                val d = reminderDones.getJSONObject(i)
+                dao.insertReminderDone(
+                    ReminderDone(
+                        reminderId = d.getLong("reminderId"),
+                        date = d.getLong("date"),
+                        doneAt = d.optLong("doneAt", System.currentTimeMillis())
                     )
                 )
             }
