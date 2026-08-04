@@ -2,6 +2,7 @@ package com.jpm.rotina.backup
 
 import com.jpm.rotina.data.Completion
 import com.jpm.rotina.data.Habit
+import com.jpm.rotina.data.Reminder
 import com.jpm.rotina.data.RotinaDao
 import org.json.JSONArray
 import org.json.JSONObject
@@ -10,7 +11,7 @@ object Backup {
 
     suspend fun export(dao: RotinaDao): String {
         val root = JSONObject()
-        root.put("version", 1)
+        root.put("version", 2)
         root.put("exportedAt", System.currentTimeMillis())
 
         val habits = JSONArray()
@@ -38,6 +39,22 @@ object Backup {
             })
         }
         root.put("completions", completions)
+
+        val reminders = JSONArray()
+        dao.reminders().forEach { r ->
+            reminders.put(JSONObject().apply {
+                put("id", r.id)
+                put("title", r.title)
+                put("date", r.date)
+                put("time", r.time ?: JSONObject.NULL)
+                put("color", r.color)
+                put("notes", r.notes)
+                put("done", r.done)
+                put("notify", r.notify)
+                put("createdAt", r.createdAt)
+            })
+        }
+        root.put("reminders", reminders)
         return root.toString(2)
     }
 
@@ -46,9 +63,12 @@ object Backup {
             val root = JSONObject(json)
             val habits = root.getJSONArray("habits")
             val completions = root.optJSONArray("completions") ?: JSONArray()
+            // absent in v1 backups, which restore with no reminders
+            val reminders = root.optJSONArray("reminders") ?: JSONArray()
 
             dao.clearCompletions()
             dao.clearHabits()
+            dao.clearReminders()
 
             for (i in 0 until habits.length()) {
                 val h = habits.getJSONObject(i)
@@ -73,6 +93,22 @@ object Backup {
                         date = c.getLong("date"),
                         time = c.getString("time"),
                         doneAt = c.optLong("doneAt", System.currentTimeMillis())
+                    )
+                )
+            }
+            for (i in 0 until reminders.length()) {
+                val r = reminders.getJSONObject(i)
+                dao.insertReminder(
+                    Reminder(
+                        id = r.optLong("id", 0),
+                        title = r.getString("title"),
+                        date = r.getLong("date"),
+                        time = if (r.isNull("time")) null else r.optString("time").ifBlank { null },
+                        color = r.optLong("color", 0xFF1E88E5),
+                        notes = r.optString("notes", ""),
+                        done = r.optBoolean("done", false),
+                        notify = r.optBoolean("notify", true),
+                        createdAt = r.optLong("createdAt", System.currentTimeMillis())
                     )
                 )
             }

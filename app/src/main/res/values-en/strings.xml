@@ -29,8 +29,8 @@
     <string name="not_today">No reminders today</string>
     <string name="paused">Paused</string>
 
-    <string name="notif_channel">Habit reminders</string>
-    <string name="notif_channel_desc">Notifications at the times set for each habit</string>
+    <string name="notif_channel">Reminders</string>
+    <string name="notif_channel_desc">Notifications for your habits and reminders at the times you set</string>
     <string name="notif_text">%1$s reminder — you can do it!</string>
     <string name="action_done">Done ✓</string>
     <string name="action_snooze">Snooze</string>
@@ -57,6 +57,31 @@
     <string name="import_done">Backup restored successfully!</string>
     <string name="import_error">Could not read the file</string>
 
+    <string name="calendar_title">Calendar</string>
+    <string name="new_reminder">New reminder</string>
+    <string name="edit_reminder">Edit reminder</string>
+    <string name="reminder_title">What do you want to be reminded of?</string>
+    <string name="reminder_notes">Notes (optional)</string>
+    <string name="error_title_required">Give the reminder a name</string>
+    <string name="delete_reminder_confirm">Delete this reminder?</string>
+    <string name="date">Date</string>
+    <string name="date_pattern_full">EEEE, MMMM d, yyyy</string>
+    <string name="set_time">Set a time</string>
+    <string name="set_time_desc">Off means the reminder covers the whole day</string>
+    <string name="all_day">All day</string>
+    <string name="notify_me">Notify me</string>
+    <string name="notify_all_day_desc">All-day reminders notify at 09:00</string>
+    <string name="notify_timed_desc">You will be notified at the chosen time</string>
+    <string name="notif_reminder_text">It\'s time!</string>
+    <string name="previous_month">Previous month</string>
+    <string name="next_month">Next month</string>
+    <string name="jump_to_today">Jump to today</string>
+    <string name="nothing_on_day">Nothing scheduled on this day.</string>
+    <string name="habits_section">Habits for the day</string>
+    <string name="future_day_hint">Future day — you can check it off when the time comes.</string>
+    <string name="legend_less">less</string>
+    <string name="legend_more">more</string>
+
     <string name="about">About</string>
-    <string name="about_text">Version 1.1 — Your personal habit app, custom made.</string>
+    <string name="about_text">Version 1.2 — Your personal habit app, custom made.</string>
 </resources>

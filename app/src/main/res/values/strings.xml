@@ -29,8 +29,8 @@
     <string name="not_today">Sem lembretes hoje</string>
     <string name="paused">Pausado</string>
 
-    <string name="notif_channel">Lembretes de hábitos</string>
-    <string name="notif_channel_desc">Notificações nos horários definidos para cada hábito</string>
+    <string name="notif_channel">Lembretes</string>
+    <string name="notif_channel_desc">Notificações dos seus hábitos e lembretes nos horários definidos</string>
     <string name="notif_text">Lembrete das %1$s — você consegue!</string>
     <string name="action_done">Feito ✓</string>
     <string name="action_snooze">Adiar</string>
@@ -57,6 +57,31 @@
     <string name="import_done">Backup restaurado com sucesso!</string>
     <string name="import_error">Não foi possível ler o arquivo</string>
 
+    <string name="calendar_title">Calendário</string>
+    <string name="new_reminder">Novo lembrete</string>
+    <string name="edit_reminder">Editar lembrete</string>
+    <string name="reminder_title">O que você quer lembrar?</string>
+    <string name="reminder_notes">Observações (opcional)</string>
+    <string name="error_title_required">Dê um nome ao lembrete</string>
+    <string name="delete_reminder_confirm">Excluir este lembrete?</string>
+    <string name="date">Data</string>
+    <string name="date_pattern_full">EEEE, d \'de\' MMMM \'de\' yyyy</string>
+    <string name="set_time">Definir horário</string>
+    <string name="set_time_desc">Desligado, o lembrete vale para o dia inteiro</string>
+    <string name="all_day">Dia inteiro</string>
+    <string name="notify_me">Receber notificação</string>
+    <string name="notify_all_day_desc">Lembretes de dia inteiro avisam às 09:00</string>
+    <string name="notify_timed_desc">Você será avisado no horário escolhido</string>
+    <string name="notif_reminder_text">Está na hora!</string>
+    <string name="previous_month">Mês anterior</string>
+    <string name="next_month">Próximo mês</string>
+    <string name="jump_to_today">Ir para hoje</string>
+    <string name="nothing_on_day">Nada marcado neste dia.</string>
+    <string name="habits_section">Hábitos do dia</string>
+    <string name="future_day_hint">Dia futuro — você pode marcar quando chegar a hora.</string>
+    <string name="legend_less">menos</string>
+    <string name="legend_more">mais</string>
+
     <string name="about">Sobre</string>
-    <string name="about_text">Versão 1.1 — Seu app de hábitos pessoal, feito sob medida.</string>
+    <string name="about_text">Versão 1.2 — Seu app de hábitos pessoal, feito sob medida.</string>
 </resources>

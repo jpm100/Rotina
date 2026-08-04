@@ -49,8 +49,10 @@ import androidx.compose.foundation.clickable
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.jpm.rotina.AppViewModel
 import com.jpm.rotina.R
+import com.jpm.rotina.TodayItem
 import com.jpm.rotina.data.Completion
 import com.jpm.rotina.data.Habit
+import com.jpm.rotina.data.Reminder
 import com.jpm.rotina.data.Stats
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -60,9 +62,11 @@ private val StreakOrange = Color(0xFFFF7043)
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun HomeScreen(vm: AppViewModel, onEdit: (Long) -> Unit) {
+fun HomeScreen(vm: AppViewModel, onEdit: (Long) -> Unit, onEditReminder: (Long, Long) -> Unit) {
     val habits by vm.habits.collectAsStateWithLifecycle()
     val completions by vm.completions.collectAsStateWithLifecycle()
+    val reminders by vm.reminders.collectAsStateWithLifecycle()
+    val todayItems by vm.todayItems.collectAsStateWithLifecycle()
     val today = LocalDate.now()
 
     Scaffold(
@@ -74,7 +78,7 @@ fun HomeScreen(vm: AppViewModel, onEdit: (Long) -> Unit) {
             )
         }
     ) { padding ->
-        if (habits.isEmpty()) {
+        if (habits.isEmpty() && todayItems.isEmpty()) {
             Box(
                 Modifier
                     .fillMaxSize()
@@ -104,23 +108,43 @@ fun HomeScreen(vm: AppViewModel, onEdit: (Long) -> Unit) {
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             item(key = "header") {
-                TodayHeader(habits, completions, today)
+                TodayHeader(habits, completions, reminders, today)
             }
-            items(habits, key = { it.id }) { habit ->
-                HabitCard(
-                    habit = habit,
-                    completions = completions,
-                    today = today,
-                    onToggle = { slot, done -> vm.setDone(habit, today, slot, done) },
-                    onClick = { onEdit(habit.id) }
-                )
+            items(
+                todayItems,
+                key = { item ->
+                    when (item) {
+                        is TodayItem.HabitItem -> "h${item.habit.id}"
+                        is TodayItem.ReminderItem -> "r${item.reminder.id}"
+                    }
+                }
+            ) { item ->
+                when (item) {
+                    is TodayItem.HabitItem -> HabitCard(
+                        habit = item.habit,
+                        completions = completions,
+                        today = today,
+                        onToggle = { slot, done -> vm.setDone(item.habit, today, slot, done) },
+                        onClick = { onEdit(item.habit.id) }
+                    )
+                    is TodayItem.ReminderItem -> ReminderRow(
+                        reminder = item.reminder,
+                        onToggle = { vm.setReminderDone(item.reminder, !item.reminder.done) },
+                        onClick = { onEditReminder(item.reminder.id, today.toEpochDay()) }
+                    )
+                }
             }
         }
     }
 }
 
 @Composable
-private fun TodayHeader(habits: List<Habit>, completions: List<Completion>, today: LocalDate) {
+private fun TodayHeader(
+    habits: List<Habit>,
+    completions: List<Completion>,
+    reminders: List<Reminder>,
+    today: LocalDate
+) {
     val dateText = today
         .format(
             DateTimeFormatter.ofPattern(
@@ -137,8 +161,10 @@ private fun TodayHeader(habits: List<Habit>, completions: List<Completion>, toda
         .filter { it.date == today.toEpochDay() }
         .map { it.habitId to it.time }
         .toSet()
-    val doneCount = scheduledSlots.count { it in doneSet }
-    val total = scheduledSlots.size
+    val todayReminders = reminders.filter { it.date == today.toEpochDay() }
+    // the day's progress counts habit slots and one-off reminders alike
+    val doneCount = scheduledSlots.count { it in doneSet } + todayReminders.count { it.done }
+    val total = scheduledSlots.size + todayReminders.size
 
     Column(Modifier.padding(bottom = 8.dp)) {
         Spacer(Modifier.height(16.dp))
