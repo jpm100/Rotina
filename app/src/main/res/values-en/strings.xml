@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Rotina</string>
+
+    <string name="home_title">Today</string>
+    <string name="stats_title">Statistics</string>
+    <string name="settings_title">Settings</string>
+
+    <string name="new_habit">New habit</string>
+    <string name="edit_habit">Edit habit</string>
+    <string name="habit_name">Habit name</string>
+    <string name="color">Color</string>
+    <string name="days_of_week">Days of the week</string>
+    <string name="times">Reminder times</string>
+    <string name="add_time">Add time</string>
+    <string name="snooze_minutes">Snooze for %1$d minutes</string>
+    <string name="enabled">Active</string>
+    <string name="save">Save</string>
+    <string name="delete">Delete</string>
+    <string name="cancel">Cancel</string>
+    <string name="ok">OK</string>
+    <string name="delete_confirm">Delete this habit and all of its history?</string>
+    <string name="error_name_required">Give the habit a name</string>
+
+    <string name="no_habits">No habits yet.\nTap the + button to create your first one!</string>
+    <string name="date_pattern">EEEE, MMMM d</string>
+    <string name="progress_done">%1$d of %2$d done</string>
+    <string name="all_done">All done for today! 🎉</string>
+    <string name="not_today">No reminders today</string>
+    <string name="paused">Paused</string>
+
+    <string name="notif_channel">Reminders</string>
+    <string name="notif_channel_desc">Notifications for your habits and reminders at the times you set</string>
+    <string name="notif_text">%1$s reminder — you can do it!</string>
+    <string name="action_done">Done ✓</string>
+    <string name="action_snooze">Snooze</string>
+
+    <string name="current_streak">Current streak</string>
+    <string name="best_streak">Best streak</string>
+    <string name="completion_30d">Last 30 days</string>
+    <string name="last_7_days">Last 7 days</string>
+    <string name="no_data">Create a habit to see your statistics here.</string>
+
+    <string name="notifications_section">Notifications</string>
+    <string name="exact_alarm">Exact alarms</string>
+    <string name="exact_ok">Allowed — reminders will arrive right on time</string>
+    <string name="exact_needed">Tap to allow and guarantee punctual reminders</string>
+    <string name="notif_settings">Notification settings</string>
+    <string name="notif_settings_desc">Sound, vibration and priority of reminders</string>
+
+    <string name="backup_section">Backup</string>
+    <string name="export_backup">Export backup</string>
+    <string name="export_desc">Saves your habits and history to a file</string>
+    <string name="import_backup">Import backup</string>
+    <string name="import_desc">Restores data from a backup file</string>
+    <string name="export_done">Backup exported successfully!</string>
+    <string name="import_done">Backup restored successfully!</string>
+    <string name="import_error">Could not read the file</string>
+
+    <string name="calendar_title">Calendar</string>
+    <string name="new_reminder">New reminder</string>
+    <string name="edit_reminder">Edit reminder</string>
+    <string name="reminder_title">What do you want to be reminded of?</string>
+    <string name="reminder_notes">Notes (optional)</string>
+    <string name="error_title_required">Give the reminder a name</string>
+    <string name="delete_reminder_confirm">Delete this reminder?</string>
+    <string name="date">Date</string>
+    <string name="date_pattern_full">EEEE, MMMM d, yyyy</string>
+    <string name="set_time">Set a time</string>
+    <string name="set_time_desc">Off means the reminder covers the whole day</string>
+    <string name="all_day">All day</string>
+    <string name="notify_me">Notify me</string>
+    <string name="notify_all_day_desc">All-day reminders notify at 09:00</string>
+    <string name="notify_timed_desc">You will be notified at the chosen time</string>
+    <string name="notif_reminder_text">It\'s time!</string>
+    <string name="previous_month">Previous month</string>
+    <string name="next_month">Next month</string>
+    <string name="jump_to_today">Jump to today</string>
+    <string name="nothing_on_day">Nothing scheduled on this day.</string>
+    <string name="habits_section">Habits for the day</string>
+    <string name="future_day_hint">Future day — you can check it off when the time comes.</string>
+    <string name="legend_less">less</string>
+    <string name="legend_more">more</string>
+
+    <string name="repeat_section">Repeat</string>
+    <string name="repeat_none">Do not repeat</string>
+    <string name="repeat_daily">Every day</string>
+    <string name="repeat_weekly">Every week</string>
+    <string name="repeat_monthly_day">Every month, on day %1$d</string>
+    <string name="repeat_monthly_week">Every month, same week</string>
+    <string name="repeat_monthly_last_week">Every month, last week</string>
+    <string name="repeat_yearly">Every year</string>
+    <string name="repeat_preview">Next: %1$s</string>
+    <string name="preview_date_pattern">EEE, MMM d</string>
+    <string name="repeats">Repeating reminder</string>
+    <string name="delete_repeating_reminder_confirm">Delete this reminder and all of its repeats?</string>
+
+    <string name="about">About</string>
+    <string name="about_text">Version 1.3 — Your personal habit app, custom made.</string>
+</resources>

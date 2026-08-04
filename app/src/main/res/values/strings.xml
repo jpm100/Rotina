@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Rotina</string>
+
+    <string name="home_title">Hoje</string>
+    <string name="stats_title">Estatísticas</string>
+    <string name="settings_title">Ajustes</string>
+
+    <string name="new_habit">Novo hábito</string>
+    <string name="edit_habit">Editar hábito</string>
+    <string name="habit_name">Nome do hábito</string>
+    <string name="color">Cor</string>
+    <string name="days_of_week">Dias da semana</string>
+    <string name="times">Horários dos lembretes</string>
+    <string name="add_time">Adicionar horário</string>
+    <string name="snooze_minutes">Adiar por %1$d minutos</string>
+    <string name="enabled">Ativo</string>
+    <string name="save">Salvar</string>
+    <string name="delete">Excluir</string>
+    <string name="cancel">Cancelar</string>
+    <string name="ok">OK</string>
+    <string name="delete_confirm">Excluir este hábito e todo o seu histórico?</string>
+    <string name="error_name_required">Dê um nome ao hábito</string>
+
+    <string name="no_habits">Nenhum hábito ainda.\nToque no botão + para criar o primeiro!</string>
+    <string name="date_pattern">EEEE, d \'de\' MMMM</string>
+    <string name="progress_done">%1$d de %2$d concluídos</string>
+    <string name="all_done">Tudo feito por hoje! 🎉</string>
+    <string name="not_today">Sem lembretes hoje</string>
+    <string name="paused">Pausado</string>
+
+    <string name="notif_channel">Lembretes</string>
+    <string name="notif_channel_desc">Notificações dos seus hábitos e lembretes nos horários definidos</string>
+    <string name="notif_text">Lembrete das %1$s — você consegue!</string>
+    <string name="action_done">Feito ✓</string>
+    <string name="action_snooze">Adiar</string>
+
+    <string name="current_streak">Sequência atual</string>
+    <string name="best_streak">Melhor sequência</string>
+    <string name="completion_30d">Últimos 30 dias</string>
+    <string name="last_7_days">Últimos 7 dias</string>
+    <string name="no_data">Crie um hábito para ver suas estatísticas aqui.</string>
+
+    <string name="notifications_section">Notificações</string>
+    <string name="exact_alarm">Alarmes exatos</string>
+    <string name="exact_ok">Permitido — os lembretes chegarão na hora certa</string>
+    <string name="exact_needed">Toque para permitir e garantir lembretes pontuais</string>
+    <string name="notif_settings">Configurações de notificação</string>
+    <string name="notif_settings_desc">Som, vibração e prioridade dos lembretes</string>
+
+    <string name="backup_section">Backup</string>
+    <string name="export_backup">Exportar backup</string>
+    <string name="export_desc">Salva seus hábitos e histórico em um arquivo</string>
+    <string name="import_backup">Importar backup</string>
+    <string name="import_desc">Restaura os dados de um arquivo de backup</string>
+    <string name="export_done">Backup exportado com sucesso!</string>
+    <string name="import_done">Backup restaurado com sucesso!</string>
+    <string name="import_error">Não foi possível ler o arquivo</string>
+
+    <string name="calendar_title">Calendário</string>
+    <string name="new_reminder">Novo lembrete</string>
+    <string name="edit_reminder">Editar lembrete</string>
+    <string name="reminder_title">O que você quer lembrar?</string>
+    <string name="reminder_notes">Observações (opcional)</string>
+    <string name="error_title_required">Dê um nome ao lembrete</string>
+    <string name="delete_reminder_confirm">Excluir este lembrete?</string>
+    <string name="date">Data</string>
+    <string name="date_pattern_full">EEEE, d \'de\' MMMM \'de\' yyyy</string>
+    <string name="set_time">Definir horário</string>
+    <string name="set_time_desc">Desligado, o lembrete vale para o dia inteiro</string>
+    <string name="all_day">Dia inteiro</string>
+    <string name="notify_me">Receber notificação</string>
+    <string name="notify_all_day_desc">Lembretes de dia inteiro avisam às 09:00</string>
+    <string name="notify_timed_desc">Você será avisado no horário escolhido</string>
+    <string name="notif_reminder_text">Está na hora!</string>
+    <string name="previous_month">Mês anterior</string>
+    <string name="next_month">Próximo mês</string>
+    <string name="jump_to_today">Ir para hoje</string>
+    <string name="nothing_on_day">Nada marcado neste dia.</string>
+    <string name="habits_section">Hábitos do dia</string>
+    <string name="future_day_hint">Dia futuro — você pode marcar quando chegar a hora.</string>
+    <string name="legend_less">menos</string>
+    <string name="legend_more">mais</string>
+
+    <string name="repeat_section">Repetição</string>
+    <string name="repeat_none">Não repetir</string>
+    <string name="repeat_daily">Todos os dias</string>
+    <string name="repeat_weekly">Toda semana</string>
+    <string name="repeat_monthly_day">Todo mês, no dia %1$d</string>
+    <string name="repeat_monthly_week">Todo mês, na mesma semana</string>
+    <string name="repeat_monthly_last_week">Todo mês, na última semana</string>
+    <string name="repeat_yearly">Todo ano</string>
+    <string name="repeat_preview">Próximas: %1$s</string>
+    <string name="preview_date_pattern">EEE, d MMM</string>
+    <string name="repeats">Lembrete repetido</string>
+    <string name="delete_repeating_reminder_confirm">Excluir este lembrete e todas as suas repetições?</string>
+
+    <string name="about">Sobre</string>
+    <string name="about_text">Versão 1.3 — Seu app de hábitos pessoal, feito sob medida.</string>
+</resources>
